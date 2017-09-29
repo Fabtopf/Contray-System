@@ -1,0 +1,13 @@
+name: Contray-System
+version: 1.0.0
+author: Fabtopf
+
+main: de.Fabtopf.System.Utilities.Main
+
+commands:
+  ban:
+  unban:
+  tempban:
+
+
+permissions:

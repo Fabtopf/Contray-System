@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="Contray-System:jar">
+    <output-path>$USER_HOME$/Desktop/MC-Server/TestServer/plugins</output-path>
+    <root id="archive" name="Contray-System.jar">
+      <element id="module-output" name="Contray-System" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../craftbukkit.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
