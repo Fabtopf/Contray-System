@@ -66,4 +66,90 @@ public class Converter {
 
     }
 
+    public static long getTimeFromTimeStampString(String timestamp) {
+
+        int day_pos = -1;
+        int hour_pos = -1;
+        int minute_pos = -1;
+        int second_pos = -1;
+
+        int seconds = 0;
+        int minutes = 0;
+        int hours = 0;
+        int days = 0;
+
+        timestamp = timestamp.toLowerCase();
+
+        String charCheck = timestamp.replaceFirst("s", "").replaceFirst("m", "").replaceFirst("h", "").replaceFirst("d", "");
+        if(charCheck.contains("s") || charCheck.contains("m") || charCheck.contains("h") || charCheck.contains("d")) {
+            return -2;
+        } else if(charCheck.equals("")) {
+            return 0;
+        } else {
+            try {
+                Integer.parseInt(charCheck);
+            } catch(Exception e) {
+                return -3;
+            }
+        }
+
+        HashMap<Integer, Integer> numbers = new HashMap<Integer, Integer>();
+
+        for(int i = 0; i < timestamp.getBytes().length; i++) {
+            if(timestamp.charAt(i) == 's') second_pos = i;
+            if(timestamp.charAt(i) == 'm') minute_pos = i;
+            if(timestamp.charAt(i) == 'h') hour_pos = i;
+            if(timestamp.charAt(i) == 'd') day_pos = i;
+            if(timestamp.charAt(i) == '0' || timestamp.charAt(i) == '1' || timestamp.charAt(i) == '2' || timestamp.charAt(i) == '3' || timestamp.charAt(i) == '4' || timestamp.charAt(i) == '5' || timestamp.charAt(i) == '6' || timestamp.charAt(i) == '7' || timestamp.charAt(i) == '8' || timestamp.charAt(i) == '9')
+                numbers.put(i, Integer.parseInt(Character.toString(timestamp.charAt(i))));
+        }
+
+        if(day_pos == -1 && hour_pos == -1 && minute_pos == -1 && second_pos == -1) {
+            second_pos = timestamp.length();
+        }
+
+        if(second_pos != -1) {
+            int pos = 0;
+            for(int i = second_pos-1; numbers.containsKey(i); i--) {
+                seconds += numbers.get(i) * Math.pow(10, pos);
+                pos++;
+            }
+        }
+
+        if(minute_pos != -1) {
+            int pos = 0;
+            for(int i = minute_pos-1; numbers.containsKey(i); i--) {
+                minutes += numbers.get(i) * Math.pow(10, pos);
+                pos++;
+            }
+        }
+
+        if(hour_pos != -1) {
+            int pos = 0;
+            for(int i = hour_pos-1; numbers.containsKey(i); i--) {
+                hours += numbers.get(i) * Math.pow(10, pos);
+                pos++;
+            }
+        }
+
+        if(day_pos != -1) {
+            int pos = 0;
+            for(int i = day_pos-1; numbers.containsKey(i); i--) {
+                days += numbers.get(i) * Math.pow(10, pos);
+                pos++;
+            }
+        }
+
+        if(numbers.containsKey(timestamp.length() -1)) {
+            int pos = 0;
+            for(int i = timestamp.length()-1; numbers.containsKey(i); i--) {
+                seconds += numbers.get(i) * Math.pow(10, pos);
+                pos++;
+            }
+        }
+
+        return new TimeManager(seconds + 1, minutes, hours, days).getUnformedSeconds();
+
+    }
+
 }

@@ -1,12 +1,10 @@
 package de.Fabtopf.System.Commands;
 
-import de.Fabtopf.System.API.Converter;
+import de.Fabtopf.System.API.*;
 import de.Fabtopf.System.API.Enum.MessageType;
 import de.Fabtopf.System.API.Manager.ModuleManager;
 import de.Fabtopf.System.API.Manager.PermissionManager;
-import de.Fabtopf.System.API.Messager;
-import de.Fabtopf.System.API.ModCommand;
-import de.Fabtopf.System.API.Module;
+import de.Fabtopf.System.API.Manager.SpielerManager;
 import de.Fabtopf.System.Utilities.Cache;
 import de.Fabtopf.System.Utilities.Main;
 import de.Fabtopf.System.Utilities.MySQL.MySQL_Utils;
@@ -16,25 +14,25 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 
 /**
- * Created by Fabi on 16.09.2017.
+ * Created by Fabi on 29.09.2017.
  */
-public class COMMAND_Ban implements CommandExecutor {
+public class COMMAND_Mute implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        Module mod = ModuleManager.getModule("BanModule");
-        ModCommand cmd = mod.getCommand("ban");
+        Module mod = ModuleManager.getModule("MuteModule");
+        ModCommand cmd = mod.getCommand("mute");
 
         HashMap<String, String> converts = new HashMap<String, String>();
         converts.put("%PLUGIN_NAME%", Main.getInstance().getDescription().getName());
         converts.put("%COMMAND_USAGE%", cmd.getUsage());
-        if(args.length > 0) converts.put("%BANNED_PLAYER%", args[0]);
+        converts.put("%OUTSTANDING_TIME%", Cache.messages.get(MessageType.TimeManager_perm));
+        if(args.length > 0) converts.put("%MUTED_PLAYER%", args[0]);
 
         if(mod.isEnabled() && (!mod.isDevmode() || (mod.isDevmode() && Cache.devmode))) {
 
@@ -45,7 +43,7 @@ public class COMMAND_Ban implements CommandExecutor {
                 if(args.length >= 2) {
                     if(MySQL_Utils.getPlayerExists(Bukkit.getOfflinePlayer(args[0]))) {
                         int playerId = MySQL_Utils.getPlayerID(Bukkit.getOfflinePlayer(args[0]));
-                        if(!MySQL_Utils.getPlayerBanned(playerId)) {
+                        if(!MySQL_Utils.getPlayerMuted(playerId)) {
                             String reason = "";
                             for(int i = 1; i < args.length; i++) {
                                 reason = reason + " " + args[i];
@@ -53,13 +51,18 @@ public class COMMAND_Ban implements CommandExecutor {
                             reason = ChatColor.translateAlternateColorCodes('&', reason.replaceFirst(" ", ""));
                             final String r = reason;
 
-                            MySQL_Utils.banPlayer(playerId, reason, -1);
+                            MySQL_Utils.mutePlayer(playerId, reason, -1);
                             Messager.sendMessage(MessageType.MuteModule_SuccessfullyMuted, p, converts);
 
-                            if(Bukkit.getOfflinePlayer(args[0]).isOnline()) Bukkit.getPlayer(args[0]).kickPlayer(Converter.getBanScreen(playerId, -1, r));
+                            if(Bukkit.getOfflinePlayer(args[0]).isOnline()) {
+                                Spieler s = SpielerManager.getSpieler(Bukkit.getOfflinePlayer(args[0]).getUniqueId().toString());
+                                s.setMuted(true);
+                                s.setMuteTime(-1);
+                                Messager.sendMessage(MessageType.MuteModule_MuteInfo_GotMuted, Bukkit.getPlayer(args[0]), converts);
+                            }
                             return true;
                         } else {
-                            Messager.sendMessage(MessageType.BanModule_AlreadyBanned, p, converts);
+                            Messager.sendMessage(MessageType.MuteModule_AlreadyMuted, p, converts);
                             return true;
                         }
                     } else {

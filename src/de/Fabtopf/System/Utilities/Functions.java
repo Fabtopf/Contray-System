@@ -8,10 +8,9 @@ import de.Fabtopf.System.API.Manager.ModuleManager;
 import de.Fabtopf.System.API.Manager.SpielerManager;
 import de.Fabtopf.System.API.Messager;
 import de.Fabtopf.System.API.Module;
-import de.Fabtopf.System.Commands.COMMAND_Ban;
-import de.Fabtopf.System.Commands.COMMAND_TempBan;
-import de.Fabtopf.System.Commands.COMMAND_Unban;
+import de.Fabtopf.System.Commands.*;
 import de.Fabtopf.System.Listeners.BANMODULE_PlayerListChange;
+import de.Fabtopf.System.Listeners.MUTEMODULE_PlayerChat;
 import de.Fabtopf.System.Listeners.SERVER_PlayerListChange;
 import de.Fabtopf.System.Utilities.MySQL.MySQL_Utils;
 import org.bukkit.Bukkit;
@@ -171,6 +170,20 @@ public class Functions {
                 mod.registerCommand("unban", "Command to unban a player", "contray.system.banmodule.unban", "/unban <Player>", new COMMAND_Unban());
                 mod.registerCommand("tempban", "Command to tempban a player", "contray.system.banmodule.tempban", "/tempban <Player> <Timestamp> <Reason>", new COMMAND_TempBan());
                 mod.registerListener("PlayerListChange", new BANMODULE_PlayerListChange());
+            }
+        }.runTaskLater(Main.getInstance(), 6);
+
+        ModuleManager.registerModule("MuteModule");
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Module mod = ModuleManager.getModule("MuteModule");
+                mod.setDevmode(false);
+
+                mod.registerCommand("mute", "Command to mute a player", "contray.system.mutemodule.mute", "/mute <Player> <Reason>", new COMMAND_Mute());
+                mod.registerCommand("unmute", "Command to unmute a player", "contray.system.mutemodule.unmute", "/unmute <Player>", new COMMAND_Unmute());
+                mod.registerCommand("tempmute", "Command to tempmute a player", "contray.system.mutemodule.tempmute", "/tempmute <Player> <Timestamp> <Rason>", new COMMAND_TempMute());
+                mod.registerListener("PlayerChat", new MUTEMODULE_PlayerChat());
             }
         }.runTaskLater(Main.getInstance(), 6);
 

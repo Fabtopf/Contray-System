@@ -13,6 +13,7 @@ import java.util.UUID;
 public class Spieler {
 
     private String uuid;
+    private String muteReason;
 
     private boolean frozen;
     private boolean muted;
@@ -29,6 +30,9 @@ public class Spieler {
             public void run() {
 
                 databaseID = MySQL_Utils.getPlayerID(Bukkit.getOfflinePlayer(UUID.fromString(uuid)));
+                mutetime = MySQL_Utils.getPlayerMuteTime(databaseID);
+                muted = MySQL_Utils.getPlayerMuted(databaseID);
+                muteReason = MySQL_Utils.getMuteReason(databaseID);
 
             }
         }.runTaskAsynchronously(Main.getInstance());
@@ -41,5 +45,14 @@ public class Spieler {
     public void leaveServer() {
 
     }
+
+    public void setMuted(boolean muted) { this.muted = muted; }
+    public void setMuteTime(long time) { this.mutetime = time; }
+    public void setFrozen(boolean frozen) { this.frozen = frozen; }
+
+    public boolean getMuted() { return muted; }
+    public boolean getFrozen() { return frozen; }
+    public long getMuteTime() { return mutetime; }
+    public int getDatabaseID() { return databaseID; }
 
 }

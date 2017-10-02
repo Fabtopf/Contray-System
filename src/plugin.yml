@@ -6,8 +6,66 @@ main: de.Fabtopf.System.Utilities.Main
 
 commands:
   ban:
+    description: Command to ban a Player
+    usage: /<command> <Player> <Reason>
+    permission: contray.system.banmodule.ban
+    aliases: [cban]
   unban:
+    description: Command to unban a Player
+    usage: /<command> <Player>
+    permission: contray.system.banmodule.unban
+    aliases: [cunban]
   tempban:
+    description: Command to tempban a Player
+    usage: /<command> <Player> <Timestamp> <Reason>
+    permission: contray.system.banmodule.tempban
+    aliases: [ctempban]
+  mute:
+    description: Command to mute a Player
+    usage: /<command> <Player> <Reason>
+    permission: contray.system.mutemodule.mute
+    aliases: [cmute]
+  unmute:
+    description: Command to unmute a Player
+    usage: /<command> <Player>
+    permission: contray.system.mutemodule.unmute
+    aliases: [cunmute]
+  tempmute:
+    description: Command to tempmute a Player
+    usage: /<command> <Player> <Timestamp> <Reason>
+    permission: contray.system.mutemodule.tempmute
+    aliases: [ctempmute]
 
 
 permissions:
+  contray.system.*:
+    description: Allows to use all Contray-System features
+    default: op
+    children:
+      - contray.system.banmodule.*: true
+      - contray.system.banmodule.ban: true
+      - contray.system.banmodule.unban: true
+      - contray.system.banmodule.tempban: true
+      - contray.system.banmodule.exempt: true
+      - contray.system.mutemodule.*: true
+      - contray.system.mutemodule.mute: true
+      - contray.system.mutemodule.unmute: true
+      - contray.system.mutemodule.tempmute: true
+      - contray.system.mutemodule.exempt: true
+  contray.system.banmodule.*:
+    description: Allows tu use all Ban-Module features
+    default: op
+    children:
+      - contray.system.banmodule.ban: true
+      - contray.system.banmodule.unban: true
+      - contray.system.banmodule.tempban: true
+      - contray.system.banmodule.exempt: true
+  contray.system.mutemodule.*:
+    description: Allows to use all Mute-Module features
+    default: op
+    children:
+      - contray.system.mutemodule.mute: true
+      - contray.system.mutemodule.unmute: true
+      - contray.system.mutemodule.tempmute: true
+      - contray.system.mutemodule.exempt: true
+

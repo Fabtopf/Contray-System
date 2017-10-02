@@ -1,13 +1,11 @@
 package de.Fabtopf.System.Commands;
 
-import de.Fabtopf.System.API.Converter;
+import de.Fabtopf.System.API.*;
 import de.Fabtopf.System.API.Enum.MessageType;
 import de.Fabtopf.System.API.Manager.ModuleManager;
 import de.Fabtopf.System.API.Manager.PermissionManager;
+import de.Fabtopf.System.API.Manager.SpielerManager;
 import de.Fabtopf.System.API.Manager.TimeManager;
-import de.Fabtopf.System.API.Messager;
-import de.Fabtopf.System.API.ModCommand;
-import de.Fabtopf.System.API.Module;
 import de.Fabtopf.System.Utilities.Cache;
 import de.Fabtopf.System.Utilities.Main;
 import de.Fabtopf.System.Utilities.MySQL.MySQL_Utils;
@@ -21,20 +19,20 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 
 /**
- * Created by Fabi on 24.09.2017.
+ * Created by Fabi on 02.10.2017.
  */
-public class COMMAND_TempBan implements CommandExecutor {
+public class COMMAND_TempMute implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        Module mod = ModuleManager.getModule("BanModule");
-        ModCommand cmd = mod.getCommand("tempban");
+        Module mod = ModuleManager.getModule("MuteModule");
+        ModCommand cmd = mod.getCommand("tempmute");
 
         HashMap<String, String> converts = new HashMap<String, String>();
         converts.put("%PLUGIN_NAME%", Main.getInstance().getDescription().getName());
         converts.put("%COMMAND_USAGE%", cmd.getUsage());
-        if(args.length > 0) converts.put("%BANNED_PLAYER%", args[0]);
+        if(args.length > 0) converts.put("%MUTED_PLAYER%", args[0]);
 
         if(mod.isEnabled() && (!mod.isDevmode() || (mod.isDevmode() && Cache.devmode))) {
 
@@ -45,7 +43,7 @@ public class COMMAND_TempBan implements CommandExecutor {
                 if(args.length >= 3) {
                     if(MySQL_Utils.getPlayerExists(Bukkit.getOfflinePlayer(args[0]))) {
                         int playerId = MySQL_Utils.getPlayerID(Bukkit.getOfflinePlayer(args[0]));
-                        if(!MySQL_Utils.getPlayerBanned(playerId)) {
+                        if(!MySQL_Utils.getPlayerMuted(playerId)) {
 
                             String reason = "";
                             for(int i = 2; i < args.length; i++) {
@@ -53,29 +51,44 @@ public class COMMAND_TempBan implements CommandExecutor {
                             }
                             reason = ChatColor.translateAlternateColorCodes('&', reason.replaceFirst(" ", ""));
 
-                            long bantime = Converter.getTimeFromTimeStampString(args[1]);
+                            long mutetime = Converter.getTimeFromTimeStampString(args[1]);
 
-                            if(bantime == 0) {
+                            if(mutetime == 0) {
                                 Messager.sendMessage(MessageType.TimeManager_InvaliedTimeStamp_3, p, converts);
                                 return true;
-                            } else if(bantime == -2) {
+                            } else if(mutetime == -2) {
                                 Messager.sendMessage(MessageType.TimeManager_InvaliedTimeStamp_1, p, converts);
                                 return true;
-                            } else if(bantime == -3) {
+                            } else if(mutetime == -3) {
                                 Messager.sendMessage(MessageType.TimeManager_InvaliedTimeStamp_2, p, converts);
                                 return true;
                             }
 
-                            final String r = reason;
-                            final long btime = (bantime * 1000) + System.currentTimeMillis();
+                            mutetime -= 1;
 
-                            MySQL_Utils.banPlayer(playerId, reason, btime);
+                            final String r = reason;
+                            final long mtime = (mutetime * 1000) + System.currentTimeMillis();
+
+                            MySQL_Utils.mutePlayer(playerId, reason, mtime);
                             Messager.sendMessage(MessageType.MuteModule_SuccessfullyMuted, p, converts);
 
-                            if(Bukkit.getOfflinePlayer(args[0]).isOnline()) Bukkit.getPlayer(args[0]).kickPlayer(Converter.getBanScreen(playerId, btime, r));
+                            if(Bukkit.getOfflinePlayer(args[0]).isOnline()) {
+                                String timeInfo = Cache.messages.get(MessageType.MuteModule_MuteInfo_TimeStamp);
+                                TimeManager muteTime = new TimeManager(mutetime);
+                                timeInfo = timeInfo.replace("%DAYS%", Long.toString(muteTime.getFormedDays())).replace("%DAYS_SHORT%", Cache.messages.get(MessageType.TimeManager_Days_short)).replace("%DAYS_LONG%", Cache.messages.get(MessageType.TimeManager_Days_long));
+                                timeInfo = timeInfo.replace("%HOURS%", Long.toString(muteTime.getFormedHours())).replace("%HOURS_SHORT%", Cache.messages.get(MessageType.TimeManager_Hours_short)).replace("%HOURS_LONG%", Cache.messages.get(MessageType.TimeManager_Hours_long));
+                                timeInfo = timeInfo.replace("%MINUTES%", Long.toString(muteTime.getFormedMinutes())).replace("%MINUTES_SHORT%", Cache.messages.get(MessageType.TimeManager_Minutes_short)).replace("%MINUTES_LONG%", Cache.messages.get(MessageType.TimeManager_Minutes_long));
+                                timeInfo = timeInfo.replace("%SECONDS%", Long.toString(muteTime.getFormedSeconds())).replace("%SECONDS_SHORT%", Cache.messages.get(MessageType.TimeManager_Seconds_short)).replace("%SECONDS_LONG%", Cache.messages.get(MessageType.TimeManager_Seconds_long));
+                                converts.put("%OUTSTANDING_TIME%", timeInfo);
+
+                                Spieler s = SpielerManager.getSpieler(Bukkit.getOfflinePlayer(args[0]).getUniqueId().toString());
+                                s.setMuted(true);
+                                s.setMuteTime(mtime);
+                                Messager.sendMessage(MessageType.MuteModule_MuteInfo_GotMuted, Bukkit.getPlayer(args[0]), converts);
+                            }
                             return true;
                         } else {
-                            Messager.sendMessage(MessageType.BanModule_AlreadyBanned, p, converts);
+                            Messager.sendMessage(MessageType.MuteModule_AlreadyMuted, p, converts);
                             return true;
                         }
                     } else {
