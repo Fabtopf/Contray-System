@@ -10,6 +10,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 /**
  * Created by Fabi on 16.09.2017.
@@ -28,6 +29,12 @@ public class BANMODULE_PlayerListChange implements Listener {
                 int playerId = MySQL_Utils.getPlayerID(op);
 
                 if (MySQL_Utils.getPlayerBanned(playerId)) {
+
+                    if(Bukkit.getPluginManager().getPlugin("PermissionsEx") != null && Bukkit.getPluginManager().getPlugin("PermissionsEx").isEnabled() && PermissionsEx.getUser(name).has("contray.system.banmodule.exempt")) {
+                        MySQL_Utils.unbanPlayer(playerId);
+                        return;
+                    }
+
                     long time = MySQL_Utils.getPlayerBanTime(playerId);
                     if(time == -1 || time > System.currentTimeMillis()) {
                         e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, Converter.getBanScreen(playerId));

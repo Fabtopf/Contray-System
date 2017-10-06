@@ -17,6 +17,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import java.util.HashMap;
 
@@ -44,38 +45,45 @@ public class COMMAND_TempBan implements CommandExecutor {
             if((p != null && PermissionManager.check(p, cmd.getPermission(), true)) || p == null) {
                 if(args.length >= 3) {
                     if(MySQL_Utils.getPlayerExists(Bukkit.getOfflinePlayer(args[0]))) {
-                        int playerId = MySQL_Utils.getPlayerID(Bukkit.getOfflinePlayer(args[0]));
-                        if(!MySQL_Utils.getPlayerBanned(playerId)) {
+                        if((Bukkit.getOfflinePlayer(args[0]).isOnline() && !PermissionManager.check(Bukkit.getPlayer(args[0]), "contray.system.banmodule.exempt", true)) || (!Bukkit.getOfflinePlayer(args[0]).isOnline() &&
+                                !Bukkit.getOfflinePlayer(args[0]).isOp() && (Bukkit.getPluginManager().getPlugin("PermissionsEx") != null && Bukkit.getPluginManager().getPlugin("PermissionsEx").isEnabled() && !PermissionsEx.getUser(args[0]).has("contray.system.banmodule.exempt")))) {
+                            int playerId = MySQL_Utils.getPlayerID(Bukkit.getOfflinePlayer(args[0]));
+                            if (!MySQL_Utils.getPlayerBanned(playerId)) {
 
-                            String reason = "";
-                            for(int i = 2; i < args.length; i++) {
-                                reason = reason + " " + args[i];
+                                String reason = "";
+                                for (int i = 2; i < args.length; i++) {
+                                    reason = reason + " " + args[i];
+                                }
+                                reason = ChatColor.translateAlternateColorCodes('&', reason.replaceFirst(" ", ""));
+
+                                long bantime = Converter.getTimeFromTimeStampString(args[1]);
+
+                                if (bantime == 0) {
+                                    Messager.sendMessage(MessageType.TimeManager_InvaliedTimeStamp_3, p, converts);
+                                    return true;
+                                } else if (bantime == -2) {
+                                    Messager.sendMessage(MessageType.TimeManager_InvaliedTimeStamp_1, p, converts);
+                                    return true;
+                                } else if (bantime == -3) {
+                                    Messager.sendMessage(MessageType.TimeManager_InvaliedTimeStamp_2, p, converts);
+                                    return true;
+                                }
+
+                                final String r = reason;
+                                final long btime = (bantime * 1000) + System.currentTimeMillis();
+
+                                MySQL_Utils.banPlayer(playerId, reason, btime);
+                                Messager.sendMessage(MessageType.MuteModule_SuccessfullyMuted, p, converts);
+
+                                if (Bukkit.getOfflinePlayer(args[0]).isOnline())
+                                    Bukkit.getPlayer(args[0]).kickPlayer(Converter.getBanScreen(playerId, btime, r));
+                                return true;
+                            } else {
+                                Messager.sendMessage(MessageType.BanModule_AlreadyBanned, p, converts);
+                                return true;
                             }
-                            reason = ChatColor.translateAlternateColorCodes('&', reason.replaceFirst(" ", ""));
-
-                            long bantime = Converter.getTimeFromTimeStampString(args[1]);
-
-                            if(bantime == 0) {
-                                Messager.sendMessage(MessageType.TimeManager_InvaliedTimeStamp_3, p, converts);
-                                return true;
-                            } else if(bantime == -2) {
-                                Messager.sendMessage(MessageType.TimeManager_InvaliedTimeStamp_1, p, converts);
-                                return true;
-                            } else if(bantime == -3) {
-                                Messager.sendMessage(MessageType.TimeManager_InvaliedTimeStamp_2, p, converts);
-                                return true;
-                            }
-
-                            final String r = reason;
-                            final long btime = (bantime * 1000) + System.currentTimeMillis();
-
-                            MySQL_Utils.banPlayer(playerId, reason, btime);
-                            Messager.sendMessage(MessageType.MuteModule_SuccessfullyMuted, p, converts);
-
-                            if(Bukkit.getOfflinePlayer(args[0]).isOnline()) Bukkit.getPlayer(args[0]).kickPlayer(Converter.getBanScreen(playerId, btime, r));
-                            return true;
                         } else {
-                            Messager.sendMessage(MessageType.BanModule_AlreadyBanned, p, converts);
+                            Messager.sendMessage(MessageType.BanModule_NotBanable, p, converts);
                             return true;
                         }
                     } else {
@@ -87,7 +95,7 @@ public class COMMAND_TempBan implements CommandExecutor {
                     return true;
                 }
             } else {
-                Messager.sendMessage(MessageType.Command_NoPerm, p, null);
+                Messager.sendMessage(MessageType.Command_NoPerm, p, converts);
                 return true;
             }
 

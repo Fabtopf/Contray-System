@@ -4,6 +4,7 @@ import de.Fabtopf.System.API.Enum.MessageType;
 import de.Fabtopf.System.Utilities.Cache;
 import de.Fabtopf.System.Utilities.Main;
 import de.Fabtopf.System.Utilities.MySQL.MySQL_Utils;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.event.Listener;
 
@@ -30,7 +31,7 @@ public class Module {
     }
 
     public void registerCommand(String name, String description, String permission, String usage, CommandExecutor executor) {
-        String permissionMessage = Cache.messages.get(MessageType.Command_NoPerm).replace("%SERVER_NAME%", Main.getInstance().getDescription().getName());
+        String permissionMessage = ChatColor.translateAlternateColorCodes('&', Cache.messages.get(MessageType.Command_NoPerm).replace("%PLUGIN_NAME%", Main.getInstance().getDescription().getName()));
         commands.put(name, new ModCommand(name, description, permission, permissionMessage, usage, executor));
     }
 

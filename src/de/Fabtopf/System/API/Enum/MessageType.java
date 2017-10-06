@@ -25,6 +25,7 @@ public enum MessageType {
     BanModule_BanScreen("BANMODULE_BanScreen", "&8- %PREFIX% &8-\n\n&cDu wurdest &9%TIMETYPE% &cvom Server gebannt!\n&cVerbleibende Zeit: &7%OUTSTANDING_TIME%\n\n&cGrund: &7%REASON%\n\n&cEntbannungsantrag stellbar: &7%UNBAN_APPLY%\n\n&eWebsite: &7%WEBSITE%\n&eTeamSpeak: &7%TEAMSPEAK%"),
     BanModule_BanScreen_TimeStamp("BANMODULE_BanScreen_TimeStamp", "%DAYS% %DAYS_LONG% %HOURS% %HOURS_LONG% %MINUTES% %MINUTES_LONG% %SECONDS% %SECONDS_LONG%"),
     BanModule_BanInfo_TimeStamp("BANMODULE_BanInfo_TimeStamp", "%DAYS%%DAYS_SHORT% %HOURS%%HOURS_SHORT% %MINUTES%%MINUTES_SHORT% %SECONDS%%SECONDS_SHORT%"),
+    BanModule_NotBanable("BANMODULE_NotBanable", "&8[&c%PLUGIN_NAME%&8] &cDu kannst &e%BANNED_PLAYER% &cnicht bannen!"),
 
     MuteModule_AlreadyMuted("MUTEMODULE_AlreadyMuted", "&8[&c%PLUGIN_NAME%&8] &cDieser Spieler ist bereits gemutet!"),
     MuteModule_NotMuted("MUTEMODULE_NotMuted", "&8[&c%PLUGIN_NAME%&8] &cDieser Spieler ist nicht gemutet!"),
@@ -34,6 +35,25 @@ public enum MessageType {
     MuteModule_MuteInfo_GotUnmuted("MUTEMODULE_MuteInfo_GotUnmuted", "&8[&c%PLUGIN_NAME%&8] &cDu wurdest entmutet!"),
     MuteModule_MuteInfo_TimeStamp("MUTEMODULE_MuteInfo_TimeStamp", "%DAYS%%DAYS_SHORT% %HOURS%%HOURS_SHORT% %MINUTES%%MINUTES_SHORT% %SECONDS%%SECONDS_SHORT%"),
     MuteModule_MuteInfo_CannotSendMessage("MUTEMODULE_MuteInfo_CannotSendMessage", "&8[&c%PLUGIN_NAME%&8] &cDu kannst keine Nachricht senden, wenn du gemutet bist!"),
+    MuteModule_NotMuteable("MUTEMODULE_NotMuteable", "&8[&c%PLUGIN_NAME%&8] &cDu kannst &e%MUTED_PLAYER% &cnicht muten!"),
+
+    BlockCommandModule_CommandList("BLOCKCOMMANDMODULE_CommandList", "\n&a+------- &9BlockedCommands &a-------+\n%BLOCKED_COMMANDS%&a+------- &9BlockedCommands &a-------+\n"),
+    BlockCommandModule_CommandDesign("BLOCKCOMMANDMODULE_CommandDesign", "&a+ &c%BLOCKED_COMMAND% &8| &7%EXEMPT_PERMISSION% &8| &e%TRIGGER_ON_CONTAIN%\n"),
+    BlockCommandModule_NothingBlocked("BLOCKCOMMANDMODULE_NothingBlocked", "&a+ &cEs wurden bisher keine Commands geblockt!\n"),
+    BlockCommandModule_SuccessfullyUnblocked("BLOCKCOMMANDMODULE_SuccessfullyUnblocked", "&8[&c%PLUGIN_NAME%&8] &cDer Befehl &e%UNBLOCKED_COMMAND% &cwurde erfolgreich entblockt!"),
+    BlockCommandModule_CommandNotBlocked("BLOCKCOMMANDMODULE_CommandNotBlocked", "&8[&c%PLUGIN_NAME%&8] &cDer Befehl &e%UNBLOCKED_COMMAND% &cist nicht geblockt!"),
+    BlockCommandModule_SuccessfullyBlocked("BLOCKCOMMANDMODULE_SuccessfullyBlocked", "&8[&c%PLUGIN_NAME%&8] &cDer Befehl &e%BLOCKED_COMMAND% &cwurde erfolgreich geblockt!"),
+    BlockCommandModule_CommandAlreadyBlocked("BLOCKCOMMANDMODULE_CommandAlreadyBlocked", "&8[&c%PLUGIN_NAME%&8] &cDer Befehl &e%BLOCKED_COMMAND% &cist bereits geblockt!"),
+    BlockCommandModule_CommandBlocked("BLOCKCOMMANDMODULE_CommandBlocked", "&8[&c%PLUGIN_NAME%&8] &cDieser Befehl ist im Moment deaktiviert!"),
+
+    FreezeModule_PlayerNotOnline("FREEZEMODULE_PlayerNotOnline", "&8[&c%PLUGIN_NAME%&8] &cUm einen Spieler zu freezen, muss dieser online sein!"),
+    FreezeModule_SuccessfullyFrozen("FREEZEMODULE_SuccessfullyFrozen", "&8[&c%PLUGIN_NAME%&8] &cDer Spieler &e%FROZEN_PLAYER% &cwurde gefreezt!"),
+    FreezeModule_SuccessfullyUnfrozen("FREEZEMODULE_SuccessfullyUnfrozen", "&8[&c%PLUGIN_NAME%&8] &cDer Spieler &e%UNFROZEN_PLAYER% &cwurde entfreezt!"),
+    FreezeModule_AlreadyFrozen("FREEZEMODULE_AlreadyFrozen", "&8[&c%PLUGIN_NAME%&8] &cDer Spieler &e%FROZEN_PLAYER% &cist bereits gefreezt!"),
+    FreezeModule_NotFrozen("FREEZEMODULE_NotFrozen", "&8[&c%PLUGIN_NAME%&8] &cDer Spieler &e%UNFROZEN_PLAYER% &cist nich gefreezt!"),
+    FreezeModule_GotFrozen("FREEZEMODULE_GotFrozen", "&8[&c%PLUGIN_NAME%&8] &cDu wurdest gefreezt!"),
+    FreezeModule_GotUnfrozen("FREEZEMODULE_GotUnfrozen", "&8[&c%PLUGIN_NAME%&8] &cDu wurdest entfreezt!"),
+    FreezeModule_NotFreezeable("FREEZEMODULE_NotFreezeable", "&8[&c%PLUGIN_NAME%&8] &cDu kannst &e%FROZEN_PLAYER% &cnicht freezen!"),
 
     TimeManager_Seconds_long("TIMEMANAGER_Seconds_long", "Sekunden"),
     TimeManager_Minutes_long("TIMEMANAGER_Minutes_long", "Minuten"),

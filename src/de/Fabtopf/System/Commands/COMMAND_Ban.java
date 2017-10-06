@@ -17,6 +17,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import java.util.HashMap;
 
@@ -44,22 +45,29 @@ public class COMMAND_Ban implements CommandExecutor {
             if((p != null && PermissionManager.check(p, cmd.getPermission(), true)) || p == null) {
                 if(args.length >= 2) {
                     if(MySQL_Utils.getPlayerExists(Bukkit.getOfflinePlayer(args[0]))) {
-                        int playerId = MySQL_Utils.getPlayerID(Bukkit.getOfflinePlayer(args[0]));
-                        if(!MySQL_Utils.getPlayerBanned(playerId)) {
-                            String reason = "";
-                            for(int i = 1; i < args.length; i++) {
-                                reason = reason + " " + args[i];
+                        if((Bukkit.getOfflinePlayer(args[0]).isOnline() && !PermissionManager.check(Bukkit.getPlayer(args[0]), "contray.system.banmodule.exempt", true)) || (!Bukkit.getOfflinePlayer(args[0]).isOnline() &&
+                                !Bukkit.getOfflinePlayer(args[0]).isOp() && (Bukkit.getPluginManager().getPlugin("PermissionsEx") != null && Bukkit.getPluginManager().getPlugin("PermissionsEx").isEnabled() && !PermissionsEx.getUser(args[0]).has("contray.system.banmodule.exempt")))) {
+                            int playerId = MySQL_Utils.getPlayerID(Bukkit.getOfflinePlayer(args[0]));
+                            if (!MySQL_Utils.getPlayerBanned(playerId)) {
+                                String reason = "";
+                                for (int i = 1; i < args.length; i++) {
+                                    reason = reason + " " + args[i];
+                                }
+                                reason = ChatColor.translateAlternateColorCodes('&', reason.replaceFirst(" ", ""));
+                                final String r = reason;
+
+                                MySQL_Utils.banPlayer(playerId, reason, -1);
+                                Messager.sendMessage(MessageType.MuteModule_SuccessfullyMuted, p, converts);
+
+                                if (Bukkit.getOfflinePlayer(args[0]).isOnline())
+                                    Bukkit.getPlayer(args[0]).kickPlayer(Converter.getBanScreen(playerId, -1, r));
+                                return true;
+                            } else {
+                                Messager.sendMessage(MessageType.BanModule_AlreadyBanned, p, converts);
+                                return true;
                             }
-                            reason = ChatColor.translateAlternateColorCodes('&', reason.replaceFirst(" ", ""));
-                            final String r = reason;
-
-                            MySQL_Utils.banPlayer(playerId, reason, -1);
-                            Messager.sendMessage(MessageType.MuteModule_SuccessfullyMuted, p, converts);
-
-                            if(Bukkit.getOfflinePlayer(args[0]).isOnline()) Bukkit.getPlayer(args[0]).kickPlayer(Converter.getBanScreen(playerId, -1, r));
-                            return true;
                         } else {
-                            Messager.sendMessage(MessageType.BanModule_AlreadyBanned, p, converts);
+                            Messager.sendMessage(MessageType.BanModule_NotBanable, p, converts);
                             return true;
                         }
                     } else {
@@ -71,7 +79,7 @@ public class COMMAND_Ban implements CommandExecutor {
                     return true;
                 }
             } else {
-                Messager.sendMessage(MessageType.Command_NoPerm, p, null);
+                Messager.sendMessage(MessageType.Command_NoPerm, p, converts);
                 return true;
             }
 

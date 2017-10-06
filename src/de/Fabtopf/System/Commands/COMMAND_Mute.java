@@ -14,6 +14,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import java.util.HashMap;
 
@@ -42,29 +43,36 @@ public class COMMAND_Mute implements CommandExecutor {
             if((p != null && PermissionManager.check(p, cmd.getPermission(), true)) || p == null) {
                 if(args.length >= 2) {
                     if(MySQL_Utils.getPlayerExists(Bukkit.getOfflinePlayer(args[0]))) {
-                        int playerId = MySQL_Utils.getPlayerID(Bukkit.getOfflinePlayer(args[0]));
-                        if(!MySQL_Utils.getPlayerMuted(playerId)) {
-                            String reason = "";
-                            for(int i = 1; i < args.length; i++) {
-                                reason = reason + " " + args[i];
-                            }
-                            reason = ChatColor.translateAlternateColorCodes('&', reason.replaceFirst(" ", ""));
-                            final String r = reason;
+                        if((Bukkit.getOfflinePlayer(args[0]).isOnline() && !PermissionManager.check(Bukkit.getPlayer(args[0]), "contray.system.mutemodule.exempt", true)) || (!Bukkit.getOfflinePlayer(args[0]).isOnline() &&
+                                !Bukkit.getOfflinePlayer(args[0]).isOp() && (Bukkit.getPluginManager().getPlugin("PermissionsEx") != null && Bukkit.getPluginManager().getPlugin("PermissionsEx").isEnabled() && !PermissionsEx.getUser(args[0]).has("contray.system.mutemodule.exempt")))) {
+                            int playerId = MySQL_Utils.getPlayerID(Bukkit.getOfflinePlayer(args[0]));
+                            if (!MySQL_Utils.getPlayerMuted(playerId)) {
+                                String reason = "";
+                                for (int i = 1; i < args.length; i++) {
+                                    reason = reason + " " + args[i];
+                                }
+                                reason = ChatColor.translateAlternateColorCodes('&', reason.replaceFirst(" ", ""));
+                                final String r = reason;
 
-                            MySQL_Utils.mutePlayer(playerId, reason, -1);
-                            Messager.sendMessage(MessageType.MuteModule_SuccessfullyMuted, p, converts);
+                                MySQL_Utils.mutePlayer(playerId, reason, -1);
+                                Messager.sendMessage(MessageType.MuteModule_SuccessfullyMuted, p, converts);
 
-                            if(Bukkit.getOfflinePlayer(args[0]).isOnline()) {
-                                Spieler s = SpielerManager.getSpieler(Bukkit.getOfflinePlayer(args[0]).getUniqueId().toString());
-                                s.setMuted(true);
-                                s.setMuteTime(-1);
-                                Messager.sendMessage(MessageType.MuteModule_MuteInfo_GotMuted, Bukkit.getPlayer(args[0]), converts);
+                                if (Bukkit.getOfflinePlayer(args[0]).isOnline()) {
+                                    Spieler s = SpielerManager.getSpieler(Bukkit.getOfflinePlayer(args[0]).getUniqueId().toString());
+                                    s.setMuted(true);
+                                    s.setMuteTime(-1);
+                                    Messager.sendMessage(MessageType.MuteModule_MuteInfo_GotMuted, Bukkit.getPlayer(args[0]), converts);
+                                }
+                                return true;
+                            } else {
+                                Messager.sendMessage(MessageType.MuteModule_AlreadyMuted, p, converts);
+                                return true;
                             }
-                            return true;
                         } else {
-                            Messager.sendMessage(MessageType.MuteModule_AlreadyMuted, p, converts);
+                            Messager.sendMessage(MessageType.MuteModule_NotMuteable, p, converts);
                             return true;
                         }
+
                     } else {
                         Messager.sendMessage(MessageType.Database_PlayerDoesntExist, p, converts);
                         return true;
@@ -74,7 +82,7 @@ public class COMMAND_Mute implements CommandExecutor {
                     return true;
                 }
             } else {
-                Messager.sendMessage(MessageType.Command_NoPerm, p, null);
+                Messager.sendMessage(MessageType.Command_NoPerm, p, converts);
                 return true;
             }
 

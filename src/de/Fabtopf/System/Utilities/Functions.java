@@ -1,15 +1,14 @@
 package de.Fabtopf.System.Utilities;
 
-import de.Fabtopf.System.API.Config;
-import de.Fabtopf.System.API.Connector;
+import de.Fabtopf.System.API.*;
 import de.Fabtopf.System.API.Enum.MessageType;
 import de.Fabtopf.System.API.Enum.ServerSetting;
+import de.Fabtopf.System.API.Manager.BlockedCommandManager;
 import de.Fabtopf.System.API.Manager.ModuleManager;
 import de.Fabtopf.System.API.Manager.SpielerManager;
-import de.Fabtopf.System.API.Messager;
-import de.Fabtopf.System.API.Module;
 import de.Fabtopf.System.Commands.*;
 import de.Fabtopf.System.Listeners.BANMODULE_PlayerListChange;
+import de.Fabtopf.System.Listeners.BLOCKCOMMANDMODULE_CommandExecute;
 import de.Fabtopf.System.Listeners.MUTEMODULE_PlayerChat;
 import de.Fabtopf.System.Listeners.SERVER_PlayerListChange;
 import de.Fabtopf.System.Utilities.MySQL.MySQL_Utils;
@@ -43,7 +42,7 @@ public class Functions {
                 if(!Cache.shutdown && Cache.configured) registerModules();
                 if(!Cache.shutdown && Cache.configured) registerValues();
             }
-        }.runTaskLater(Main.getInstance(), 2);
+        }.runTaskLater(Main.getInstance(), 4);
 
         if(!Cache.configured) {
             Messager.sendMessage(MessageType.System_PluginNotConfigured, null, converts);
@@ -153,6 +152,10 @@ public class Functions {
                 MySQL_Utils.registerServerSetting(setting.getPath(), setting.getDefaultMessage());
             }
         }
+
+        for(BlockedCommand cmd : MySQL_Utils.getBlockedCommands()) {
+            BlockedCommandManager.registerBlockedCommand(cmd.getCommand(), cmd.getPermission(), cmd.isTriggerIfContains());
+        }
     }
 
     public static void registerModules() {
@@ -184,6 +187,30 @@ public class Functions {
                 mod.registerCommand("unmute", "Command to unmute a player", "contray.system.mutemodule.unmute", "/unmute <Player>", new COMMAND_Unmute());
                 mod.registerCommand("tempmute", "Command to tempmute a player", "contray.system.mutemodule.tempmute", "/tempmute <Player> <Timestamp> <Rason>", new COMMAND_TempMute());
                 mod.registerListener("PlayerChat", new MUTEMODULE_PlayerChat());
+            }
+        }.runTaskLater(Main.getInstance(), 6);
+
+        ModuleManager.registerModule("BlockCommandModule");
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Module mod = ModuleManager.getModule("BlockCommandModule");
+                mod.setDevmode(false);
+
+                mod.registerCommand("blockcommand", "Command to block other commands", "contray.system.blockcommandmoudle.blockcommand", "/blockcommand list | add <Command> [check_contain] [exempt_Permission] | remove <Command>", new COMMAND_BlockCommand());
+                mod.registerListener("PlayerCommandPreprocess", new BLOCKCOMMANDMODULE_CommandExecute());
+            }
+        }.runTaskLater(Main.getInstance(), 6);
+
+        ModuleManager.registerModule("FreezeModule");
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Module mod = ModuleManager.getModule("FreezeModule");
+                mod.setDevmode(false);
+
+                mod.registerCommand("freeze", "Command to freeze a player", "contray.system.freezemodule.freeze", "/freeze <Player> [on|off]", new COMMAND_Freeze());
+                //mod.registerListener("PlayerMove", new FREEZEMODULE_PlayerMove());
             }
         }.runTaskLater(Main.getInstance(), 6);
 

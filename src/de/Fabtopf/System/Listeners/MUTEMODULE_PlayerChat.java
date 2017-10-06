@@ -35,6 +35,14 @@ public class MUTEMODULE_PlayerChat implements Listener {
             Spieler s = SpielerManager.getSpieler(p.getUniqueId().toString());
 
             if(s.getMuted() && (s.getMuteTime() == -1 || s.getMuteTime() > System.currentTimeMillis())) {
+
+                if(p.hasPermission("contray.system.mutemodule.exempt")) {
+                    s.setMuted(false);
+                    s.setMuteTime(0);
+                    MySQL_Utils.unmutePlayer(s.getDatabaseID());
+                    return;
+                }
+
                 HashMap<String, String> converts = new HashMap<String, String>();
                 converts.put("%PLUGIN_NAME%", Main.getInstance().getDescription().getName());
 

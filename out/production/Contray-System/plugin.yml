@@ -4,6 +4,8 @@ author: Fabtopf
 
 main: de.Fabtopf.System.Utilities.Main
 
+soft-depends: [PermissionsEx]
+
 commands:
   ban:
     description: Command to ban a Player
@@ -35,6 +37,16 @@ commands:
     usage: /<command> <Player> <Timestamp> <Reason>
     permission: contray.system.mutemodule.tempmute
     aliases: [ctempmute]
+  blockcommand:
+    description: Command to block other commands
+    usage: /<command> list | add <Command> [check_contain] [exempt_Permission] | remove <Command>
+    permission: contray.system.blockcommandmodule.blockcommand
+    aliases: [cblockcommand, blockcmd, cblockcmd]
+  freeze:
+    description: Command to toggle freeze-state of a player
+    usage: /<command> <Player> [on|off]
+    permission: contray.system.freezemodule.freeze
+    aliases: [cfreeze]
 
 
 permissions:
@@ -52,6 +64,13 @@ permissions:
       - contray.system.mutemodule.unmute: true
       - contray.system.mutemodule.tempmute: true
       - contray.system.mutemodule.exempt: true
+      - contray.system.blockcommandmodule.*: true
+      - contray.system.blockcommandmodule.blockcommand: true
+      - contray.system.blockcommandmodule.exempt: true
+      - contray.system.freezemodule.*: true
+      - contray.system.freezemodule.freeze: true
+      - contray.system.freezemodule.carry: true
+      - contray.system.freezemodule.exempt: true
   contray.system.banmodule.*:
     description: Allows tu use all Ban-Module features
     default: op
@@ -68,4 +87,17 @@ permissions:
       - contray.system.mutemodule.unmute: true
       - contray.system.mutemodule.tempmute: true
       - contray.system.mutemodule.exempt: true
+  contray.system.blockcommand.*:
+    description: Allows to use all BlockCommand-Module features
+    default: op
+    children:
+      - contray.system.blockcommandmodule.blockcommand: true
+      - contray.system.blockcommandmodule.exempt: true
+  contray.system.freezemodule.*:
+    description: Allows tu use all Freeze-Module features
+    default: op
+    children:
+      - contray.system.freezemodule.freeze: true
+      - contray.system.freezemodule.carry: true
+      - contray.system.freezemodule.exempt: true
 

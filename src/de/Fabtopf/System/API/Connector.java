@@ -208,6 +208,26 @@ public class Connector {
 
     }
 
+    public double getDouble(String table, String checkColumn, Object checkValue, String getColumn) {
+
+        try {
+            ResultSet rs = getResult("SELECT * FROM " + table);
+
+            while(rs.next()) {
+                if(rs.getObject(checkColumn).toString().equalsIgnoreCase(checkValue.toString())) {
+                    return rs.getDouble(getColumn);
+                }
+            }
+        } catch(SQLException e) {
+            if(Cache.devmode) e.printStackTrace();
+            Messager.sendError(ErrorType.MySQL_ResultFail);
+            return -1;
+        }
+
+        return -1;
+
+    }
+
     public Object getObject(String table, String checkColumn, Object checkValue, String getColumn) {
 
         try {
